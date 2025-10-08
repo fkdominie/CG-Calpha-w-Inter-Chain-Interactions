@@ -1302,8 +1302,9 @@ double hp(int iflag) {
     qpair=0;
     for (i=0;i<N;i++) {
       if (seqhp[i] == 0) continue;
-      for (j=0;j<i-3;j++) {
+      for (j=0;j<i;j++) {						/* Changed j<i-3 --> j<i */
 	if (seqhp[j] == 0) continue;
+	if (a2c[i] == a2c[j]); continue;			/* Added this line to skip same-chain interactions */
 	if (cc[i][j]!=1) {
 	  iq1[qpair]=i;
 	  iq2[qpair]=j;
