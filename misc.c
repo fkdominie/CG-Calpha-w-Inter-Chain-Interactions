@@ -744,32 +744,52 @@ int relax_crowders(void) {
   return 0;
 }
 /****************************************************************************/
-void read_cont_param(char fn[],int ip1[],int ip2[],int npair,double kcont[]) {
-  int i,j,m = 0;
-  double kread;
-  FILE *fp;
-  
-  if ( (fp = fopen(fn,"r")) != NULL ) {
-
-    while (3 == fscanf(fp,"%i %i %lf\n",&i,&j,&kread)) {
-    
-      for (m = 0; m < npair; ++m) {
-	if ( (i == ip1[m] && j == ip2[m]) ||
-	     (i == ip2[m] && j == ip1[m]) ) break;
-      }
-      
-      if (m == npair) {
-	printf("<read_contpar> (%s) unknown contact %i %i %i\n",fn, m,i,j);
-	continue;
-      }
-      
-      kcont[m] = kread;
-      printf("<read_contpar> (%s) setting strength of contact %i %i %i to %lf\n",
-	     fn,m,i,j,kcont[m]);
+//–– Convert “123.4” or “NCS1”/“NCS2” into a double
+static double lookup_strength(const char *tok) {
+    // numeric literal?
+    if (isdigit(tok[0]) || tok[0]=='-' || tok[0]=='.') {
+        return atof(tok);
     }
-  }
-  
-  return ;
+    // symbolic constants
+    if (strcmp(tok, "NCS1")==0) return (double) NCS1;
+    if (strcmp(tok, "NCS2")==0) return (double) NCS2;
+    fprintf(stderr, "Unknown contact strength '%s'\n", tok);
+    exit(EXIT_FAILURE);
+}
+/****************************************************************************/
+void read_cont_param(char fn[],
+                     int  ip1[],
+                     int  ip2[],
+                     int  npair,
+                     double kcont[])
+{
+    int    i, j, m;
+    double kread;
+    char   tok[32];
+    FILE  *fp;
+
+    if ((fp = fopen(fn, "r")) != NULL) {
+        while (fscanf(fp, "%i %i %31s\n", &i, &j, tok) == 3) {
+            kread = lookup_strength(tok);
+
+            for (m = 0;  m < npair;  ++m) {
+                if ((i == ip1[m] && j == ip2[m]) ||
+                    (i == ip2[m] && j == ip1[m])) {
+                    break;
+                }
+            }
+            if (m == npair) {
+                printf("<read_contpar> (%s) unknown contact %i %i %i\n",
+                       fn, m, i, j);
+                continue;
+            }
+
+            kcont[m] = kread;
+            printf("<read_contpar> (%s) setting strength of contact %i %i %i to %lf\n",
+                   fn, m, i, j, kcont[m]);
+        }
+	fclose(fp);
+    }
 }
 /****************************************************************************/
 void read_bonded_param(char fn[],
