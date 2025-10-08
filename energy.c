@@ -615,9 +615,9 @@ double torsion(int iflag) {
 	fy[l]+=fph*dly;
 	fz[l]+=fph*dlz;
       }
-
-      return e;
-    }
+	} 
+    return e;
+	
   }
 
   if (iflag > 0) { /* print energy function */
