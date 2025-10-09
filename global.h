@@ -14,7 +14,7 @@ extern int a2c[];
 extern const double vbox;
 /************* energies and forces ******************************************/
 extern double Ekin,Epot,Eben,Ebon,Erep;  
-extern double Etor,Econ,Ehp;
+extern double Etor,Econ,Ehp,Eel;
 extern double Econ1,Econ2,Ecorr;
 extern double fx[],fy[],fz[];         
 extern double fxo[],fyo[],fzo[];      
