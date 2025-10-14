@@ -26,7 +26,7 @@
 # define FF_TORS 2                 /* tors() -- 1 on, 2 dual, 0 off         */
 # define FF_CONT 2                 /* cont() -- 1 on, 2 dual, 0 off         */
 # define FF_EXVOL 1                /* exvol()-- 1 on, 0 off                 */
-# define FF_SEQ 0                  /* hp()   -- 1 on, 0 off                 */
+# define FF_SEQ 1                  /* hp()   -- 1 on, 0 off                 */
 # define FF_MULTIBODY 1            /* cont() -- multibody effects           */ 
 /************* measurements *************************************************/
 # define NBIN 200                  /* # bins                                */
@@ -38,17 +38,17 @@
 # define SNAP2 5000                /* for interval SNAP1 < imd < SNAP2      */
 # define RMSD 2                    /* 1 NATIVE, 2 NATIVE2, 0 off            */
 /************* files input **************************************************/
-# define NATIVE "native_2kdl"
-# define NATIVE2 "native_2kdm"
-# define CONTMAP "smog_2KDL"
-# define CONTMAP2 "smog_2KDM"
+# define NATIVE "native_4HHB-1YMB"
+# define NATIVE2 ""
+# define CONTMAP "smog_4HHB-1YMB"
+# define CONTMAP2 ""
 # define CONTMAP3 ""
 # define CONTMAP4 ""
-# define START "native_2kdm"
+# define START "native_4HHB-1YMB"
 # define INPUT "input"
 # define INPUTG "inputg"
-# define CONTPAR "./cont_param_2KDL_smog_1.00"
-# define CONTPAR2 "./cont_param_2KDM_smog_0.92"
+# define CONTPAR "./cont_param_4HHB-1YMB_smog"
+# define CONTPAR2 ""
 # define BONDEDPAR ""
 # define BONDEDPAR2 ""
 /************* files output *************************************************/
