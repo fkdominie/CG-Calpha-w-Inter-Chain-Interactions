@@ -30,7 +30,7 @@
 # define FF_MULTIBODY 1            /* cont() -- multibody effects           */ 
 /************* measurements *************************************************/
 # define NBIN 200                  /* # bins                                */
-# define NOBS 19                   /* # observables                         */
+# define NOBS 20                   /* # observables                         */
 # define MAXCELL 25000             /* max # cells                           */
 # define MAXP 1000                 /* max # contact pairs                   */
 # define MAXNC 500                 /* max # contacts                        */
