@@ -6,6 +6,9 @@
 # define ISTART 1                  /* 0 native, 1 read, 2 random            */
 # define ISEED 1                   /* 1 randomize seed (/dev/urandom)       */
 # define IFIX 0                    /* 1,0                                  */
+# define LAMBDA 0.000              /* Fold-switching parameter              */
+# define NCS1 (1 + LAMBDA)          /* Native Contact Strength 1            */
+# define NCS2 (1 - LAMBDA)          /* Native Contact Strength 2            */
 /************* MD parameters ************************************************/
 # define MDSTEP (200000)       /* max # md steps                        */
 # define NTHERM (1000)           /* # discarded steps                     */
