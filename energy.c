@@ -1271,77 +1271,18 @@ double cont_corr(int iflag) {
   
   return 0;
 }
-/**************** protein grouping (local to energy.c) ***********************/
-static int *c2p = NULL;       // chain -> protein
-static int *a2p = NULL;       // bead  -> protein
-static int a2p_ready = 0;
-
-static int *uf_parent = NULL, *uf_rankv = NULL;
-static int uf_find(int x){ return uf_parent[x]==x ? x : (uf_parent[x]=uf_find(uf_parent[x])); }
-static void uf_unite(int a,int b){
-    a = uf_find(a); b = uf_find(b);
-    if (a==b) return;
-    if (uf_rankv[a] < uf_rankv[b]) uf_parent[a]=b;
-    else if (uf_rankv[a] > uf_rankv[b]) uf_parent[b]=a;
-    else { uf_parent[b]=a; uf_rankv[a]++; }
-}
-
-static void build_a2p_from_contacts(void){
-    if (a2p_ready) return;
-
-    // allocate
-    uf_parent = (int*)malloc(NCH*sizeof *uf_parent);
-    uf_rankv  = (int*)calloc(NCH,sizeof *uf_rankv);
-    c2p       = (int*)malloc(NCH*sizeof *c2p);
-    a2p       = (int*)malloc(N  *sizeof *a2p);
-
-    for (int c=0;c<NCH;c++) uf_parent[c]=c;
-
-    // Detect whether a2c[] is 0- or 1-based
-    int a2c_is_one_based = 0;
-    for (int i=0;i<N;i++){ if (a2c[i]==NCH) { a2c_is_one_based = 1; break; } }
-
-    // Union chains that have any native contact between them
-    for (int i=0;i<N;i++){
-        int ci = a2c[i] - (a2c_is_one_based?1:0);
-        for (int j=0;j<i;j++){
-            if (cc[i][j] != 1) continue;
-            int cj = a2c[j] - (a2c_is_one_based?1:0);
-            if (ci != cj) uf_unite(ci, cj);
-        }
-    }
-
-    // Compress to compact protein IDs
-    int *root2pid = (int*)malloc(NCH*sizeof *root2pid);
-    for (int k=0;k<NCH;k++) root2pid[k] = -1;
-    int pid = 0;
-    for (int c=0;c<NCH;c++){
-        int r = uf_find(c);
-        if (root2pid[r] < 0) root2pid[r] = pid++;
-        c2p[c] = root2pid[r];
-    }
-    free(root2pid);
-
-    // bead -> protein
-    for (int i=0;i<N;i++){
-        int ci = a2c[i] - (a2c_is_one_based?1:0);
-        a2p[i] = c2p[ci];
-    }
-    a2p_ready = 1;
-
-     fprintf(stdout,"<prot> proteins: %d\n", pid);
-}
 /****************************************************************************/
 double hp(int iflag) {
   int i,j,m,seqhp[N];                 
   double r,r2,rx,ry,rz,dr,fr,edr,e=0;
   static double  aco,bco,cq2;
 
-  // untested
+  // in testing
   
   if (FF_SEQ == 0) return 0;
 
   if (iflag < 0) {
+    printf("<hp> NPROT=%d  a2p[0]=%d  a2p[N-1]=%d\n", NPROT, a2p[0], a2p[N-1]);
     for (i=0;i<N;i++) {
       seqhp[i] = 0;
       switch (seq[i]) {

@@ -821,6 +821,44 @@ void read_bonded_param(char fn[],
   return ;
 }
 /****************************************************************************/
+static int parse_c2p_from_string(const char *spec) {
+    // spec format: "0,0,0,0,1" (NCH comma-separated nonnegative ints)
+    c2p = (int*)malloc(NCH * sizeof *c2p);
+    int c = 0;
+    const char *p = spec;
+    while (*p && c < NCH) {
+        int id = 0, got = 0;
+        while (*p >= '0' && *p <= '9') { id = id*10 + (*p - '0'); p++; got = 1; }
+        if (!got) return 0;
+        c2p[c] = id;
+        if (NPROT <= id) NPROT = id + 1;
+        c++;
+        if (*p == ',') p++;
+    }
+    return (c == NCH);
+}
+
+void build_protein_maps(const char *spec) {
+    if (a2p) return;                        // already built
+
+    if (spec) {
+        if (!parse_c2p_from_string(spec)) {
+            fprintf(stderr,"[prot] Bad c2p spec: \"%s\"\n", spec);
+            exit(1);
+        }
+    } else {
+        // fallback: each chain is its own protein
+        c2p = (int*)malloc(NCH * sizeof *c2p);
+        for (int c=0; c<NCH; c++) c2p[c] = c;
+        NPROT = NCH;
+    }
+
+    a2p = (int*)malloc(N * sizeof *a2p);
+    for (int i=0; i<N; i++) a2p[i] = c2p[a2c[i]];
+
+    fprintf(stdout, "<prot> NCH=%d  NPROT=%d  a2p built\n", NCH, NPROT);
+}
+/****************************************************************************/
 /***** INITIALIZATION *******************************************************/
 /****************************************************************************/
 void init(int iflag) {
@@ -847,6 +885,7 @@ void init(int iflag) {
     iEnd[j] = k-1;
   }
   fclose(fp1);
+  build_protein_maps(C2P_SPEC);
 
   /* read g parameters */
 

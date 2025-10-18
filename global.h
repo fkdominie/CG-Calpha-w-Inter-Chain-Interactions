@@ -11,6 +11,9 @@ extern double sx[],sy[],sz[];
 extern double boxhf; 
 extern int iBeg[],iEnd[];
 extern int a2c[];
+extern int *a2p;
+extern int *c2p;
+extern int NPROT;
 extern const double vbox;
 /************* energies and forces ******************************************/
 extern double Ekin,Epot,Eben,Ebon,Erep;  
@@ -205,6 +208,7 @@ void bc(double *x);
 void in2box(void);
 void ch2box(int ich);
 void cr2box(int icr);
+void build_protein_maps(const char *spec);
 //void ch2boxcr(int icr);
 void dof2cart(int iflag);
 int cart2dof(int err);
