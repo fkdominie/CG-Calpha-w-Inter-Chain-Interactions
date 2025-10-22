@@ -2,12 +2,12 @@
 # define NTMP 1                    /* # temperatures                        */
 # define TMAX 0.88                /* max temperature                       */
 # define TMIN 0.88                 /* min temperature                       */
-# define BOX 100                   /* simulation box                        */
+# define BOX 150                   /* simulation box                        */
 # define ISTART 1                  /* 0 native, 1 read, 2 random            */
 # define ISEED 1                   /* 1 randomize seed (/dev/urandom)       */
 # define IFIX 0                    /* 1,0                                  */
 # define LAMBDA 0.000              /* Fold-switching parameter              */
-# define NCS1 (1 + LAMBDA)          /* Native Contact Strength 1            */
+# define NCS1 8                    /* Native Contact Strength 1            */
 # define NCS2 (1 - LAMBDA)          /* Native Contact Strength 2            */
 /************* MD parameters ************************************************/
 # define MDSTEP (200000)       /* max # md steps                        */
@@ -27,16 +27,17 @@
 # define FF_CONT 2                 /* cont() -- 1 on, 2 dual, 0 off         */
 # define FF_EXVOL 1                /* exvol()-- 1 on, 0 off                 */
 # define FF_SEQ 1                  /* hp()   -- 1 on, 0 off                 */
+# define FF_EL 1                   /* el()   -- 1 on, 0 off                 */
 # define FF_MULTIBODY 1            /* cont() -- multibody effects           */ 
 /************* measurements *************************************************/
 # define NBIN 200                  /* # bins                                */
-# define NOBS 20                   /* # observables                         */
+# define NOBS 21                   /* # observables                         */
 # define MAXCELL 25000             /* max # cells                           */
-# define MAXP 1000                 /* max # contact pairs                   */
+# define MAXP 16000                /* max # contact pairs                   */
 # define MAXNC 500                 /* max # contacts                        */
 # define SNAP1 5000                /* write snapshots to directory SNAPDIR  */
 # define SNAP2 5000                /* for interval SNAP1 < imd < SNAP2      */
-# define RMSD 2                    /* 1 NATIVE, 2 NATIVE2, 0 off            */
+# define RMSD 0                    /* 1 NATIVE, 2 NATIVE2, 0 off            */
 /************* files input **************************************************/
 # define NATIVE "native_4HHB-1YMB"
 # define NATIVE2 ""

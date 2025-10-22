@@ -37,12 +37,14 @@ int npair4;
 int npair5;
 int spair;                         /* # native contacts                     */
 int qpair;                         /* # native contacts                     */
+int zpair;                         /* # native contacts                     */
 int ip1[MAXP],ip2[MAXP];           /* list of contacts                      */
 int ip3[MAXP],ip4[MAXP];           /* list of contacts                      */
 int ip5[MAXP],ip6[MAXP];           /* list of contacts                      */
 int ip7[MAXP],ip8[MAXP];           /* list of contacts                      */
 int ip9[MAXP],ip10[MAXP];           /* list of contacts                     */
 int iq1[MAXP],iq2[MAXP];           /* list of contacts                      */
+int iz1[MAXP],iz2[MAXP];           /* lost of contacts                      */
 int mc1[MAXP],mc2[MAXP];           /* common native1/native2 contacts       */
 int nni1[MAXP],nnj1[MAXP];
 int nni2[MAXP],nnj2[MAXP];
@@ -70,11 +72,14 @@ double distg2[MAXP];              /* distances                             */
 double distg3[MAXP];              /* distances                             */
 double distg4[MAXP];              /* distances                             */
 double iqkap[MAXP];
+double izcharge[MAXP];
 short cc[N][N];                    /* 1 native contact, 0 otherwise         */
 /************* sequence effects *********************************************/
 int seq[N];                        /* sequence                              */
 int seqhp[N];                      /* sequence hp: >0 hp, 0 polar           */
+int seqel[N];                      /* sequence el:                          */
 double kap[N];                     /* hydrophobicity strengths              */
+double charge[N];                  /* electrostatic charge                  */
 /************** extra *******************************************************/
 double kcon60,krep12,kbon2,kth2;
 double cthmin,sthmin;
@@ -1282,7 +1287,6 @@ double hp(int iflag) {
   if (FF_SEQ == 0) return 0;
 
   if (iflag < 0) {
-    printf("<hp> NPROT=%d  a2p[0]=%d  a2p[N-1]=%d\n", NPROT, a2p[0], a2p[N-1]);
     for (i=0;i<N;i++) {
       seqhp[i] = 0;
       switch (seq[i]) {
@@ -1344,3 +1348,84 @@ double hp(int iflag) {
   return khp*e;
 }
 /****************************************************************************/
+/********* In-Progress: Debye-Screened Electrostatic Interactions ***********/
+/****************************************************************************/
+double el(int iflag) {
+  int i,j,m,seqel[N];
+  double r,r2,rx,ry,rz,dr,dr2,dr3,dr4,dr5,er,V,dVdr,Veff,dVeff,S,dSdr,fr,e=0;
+  static double r_off,r_on,inv_w,r_off2,inv_lambdaD;
+
+  if (FF_EL == 0) return 0;
+
+  if (iflag < 0) {
+    for (i=0;i<N;i++) {
+      seqel[i] = 0;
+      switch (seq[i]) {
+      case 'D' : {seqel[i] = -1; break;}
+      case 'E' : {seqel[i] = -1; break;}
+      case 'K' : {seqel[i] = +1; break;}
+      case 'R' : {seqel[i] = +1; break;}
+      default  : {seqel[i] =  0; break;}
+      }
+    }
+
+    for (i=0;i<N;i++) charge[i] = seqel[i];
+
+    zpair=0;
+    for (i=0;i<N;i++) {
+      if (seqel[i] == 0) continue;
+      for (j=0;j<i;j++) {
+    if (seqel[j] == 0) continue;
+    if (a2p[i] == a2p[j]) continue;
+    if (cc[i][j] != 1) {
+      iz1[zpair]=i;
+      iz2[zpair]=j;
+      izcharge[zpair++]=charge[i]*charge[j];
+    }
+        }
+      }
+      r_off = cutel;
+      r_on = 0.8 * r_off;
+      inv_w = 1.0 / (r_off - r_on);
+      r_off2 = r_off * r_off;
+      inv_lambdaD = 1.0/lambda_D;
+
+    printf("<el> non-native el pairs: zpair %i\n",zpair);
+    printf("<el> cutel %f\n",cutel);
+    printf("<el> r_off %e r_on %e\n",r_off,r_on);
+    return 0;
+  }
+
+  for (m=0;m<zpair;m++) {
+    i=iz1[m]; j=iz2[m];
+    rx=x[j]-x[i]; bc(&rx);
+    ry=y[j]-y[i]; bc(&ry);
+    rz=z[j]-z[i]; bc(&rz);
+    r2=rx*rx+ry*ry+rz*rz;
+    if (r2>=r_off2) continue;
+    if ((r=sqrt(r2))<1e-12) continue;
+    er=exp(-r*inv_lambdaD);
+    V=kel*izcharge[m]*(er/r);
+    dVdr=-kel*izcharge[m]*er*(1/(r2)+inv_lambdaD/r);
+    if (r<=r_on) {
+      Veff=V;
+      dVeff=dVdr;
+    } else {
+        dr=(r-r_on)*inv_w;
+        dr2=dr*dr,dr3=dr2*dr,dr4=dr3*dr,dr5=dr4*dr;
+        S=1.0-10.0*dr3+15.0*dr4-6.0*dr5;
+        dSdr=(-30.0*dr2+60.0*dr3-30.0*dr4)*inv_w;
+        Veff=S*V;
+        dVeff=S*dVdr+V*dSdr;
+    }
+    e+=Veff;
+    fr=(-dVeff)/r;
+    fx[i]-=fr*rx;
+    fy[i]-=fr*ry;
+    fz[i]-=fr*rz;
+    fx[j]+=fr*rx;
+    fy[j]+=fr*ry;
+    fz[j]+=fr*rz;
+  }
+  return e;
+}

@@ -72,7 +72,7 @@ int main (int argc,char *argv[])
       
       cart2dof(0);
       Epot=(Ebon=bond(0))+(Eben=bend(0))+(Erep=exvol(0))+(Etor=torsion(0))+
-	(Econ=cont(0))+(Ehp=hp(0))+(Ecc=crowd_crowd(0))+(Ecb=crowd_bead(0)); 
+	(Econ=cont(0))+(Ehp=hp(0))+(Eel=el(0))+(Ecc=crowd_crowd(0))+(Ecb=crowd_bead(0)); 
 
       rmsd1 = rmsd_calc(xnat,ynat,znat,x,y,z,0,N-1);
       rmsd2 = rmsd_calc(xnat2,ynat2,znat2,x,y,z,0,N-1);

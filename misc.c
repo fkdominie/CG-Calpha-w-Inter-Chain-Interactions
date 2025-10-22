@@ -25,17 +25,17 @@ void read_bonded_param(char fn[],double v1[],double k1[],double v2[],double k2[]
 void printinfo(void) {
   printf("\n");
   printf("Simulation parameters: \n");
-  printf("  N %i NCH %i NCR %i \n",N,NCH,NCR);
+  printf("  N %i NCH %i NCR %i NPROT %i \n",N,NCH,NCR,NPROT);
   printf("  MDSTEP %li NTHERM %i\n",(long)MDSTEP,NTHERM);
   printf("  IRT %i ICONF %i ISTART %i\n",IRT,ICONF,ISTART);
   printf("  NTMP %i TMIN %lf TMAX %lf \n",NTMP, TMIN, TMAX);
   printf("  BOX %i \n",BOX);
   printf("Force field:\n");
   printf("  FF_BOND %i FF_BEND %i FF_TORS %i\n",FF_BOND,FF_BEND,FF_TORS);
-  printf("  FF_CONT %i FF_SEQ %i \n",FF_CONT,FF_SEQ);
+  printf("  FF_CONT %i FF_SEQ %i FF_EL %i \n",FF_CONT,FF_SEQ,FF_EL);
   printf("  kbon %f kth %f kph1 %f kph3 %f \n",
 	 kbon,kth,kph1,kph3);
-  printf("  krep %f kcon %f khp %f \n",krep,kcon,khp);
+  printf("  krep %f kcon %f khp %f kel %f \n",krep,kcon,khp,kel);
   printf("  eps %f sigsa %f \n",eps,sigsa);
   if (NCR > 0){
     printf("Interaction parameters crowders:\n");
@@ -170,7 +170,7 @@ int read_checkpnt() {
     fx[i] = fy[i] = fz[i] = 0;
 
   Epot=(Ebon=bond(0))+(Eben=bend(0))+(Erep=exvol(0))+(Etor=torsion(0))+
-    (Econ=cont(0))+(Ehp=hp(0))+(Ecc=crowd_crowd(0))+(Ecb=crowd_bead(0)); 
+    (Econ=cont(0))+(Ehp=hp(0))+(Eel=el(0))+(Ecc=crowd_crowd(0))+(Ecb=crowd_bead(0)); 
   
   Ekin = 0;
   for (i=0;i<N;i++)
@@ -204,7 +204,7 @@ void write_checkpnt(void) {
     fxc[i] = fyc[i] = fzc[i] = 0;
 
   Epot=(Ebon=bond(0))+(Eben=bend(0))+(Erep=exvol(0))+(Etor=torsion(0))+
-    (Econ=cont(0))+(Ehp=hp(0))+(Ecc=crowd_crowd(0))+(Ecb=crowd_bead(0)); 
+    (Econ=cont(0))+(Ehp=hp(0))+(Eel=el(0))+(Ecc=crowd_crowd(0))+(Ecb=crowd_bead(0)); 
   
   Ekin = 0;
   for (i=0;i<N;i++)
@@ -962,6 +962,7 @@ void init(int iflag) {
   kph3*=eps;
   kcon*=eps;
   khp*=eps;
+  kel*=eps;
   krep*=eps;
   epsilonrep*=eps;
   eclash*=eps;
@@ -1127,6 +1128,7 @@ void init(int iflag) {
   exvol(-1);
   cont(-1);
   hp(-1);
+  el(-1);
 
   read_conf(-1,"","");
   histo_bond(-1);
@@ -1225,7 +1227,7 @@ void init(int iflag) {
   for (i = 0; i<N; i++) fx[i]=fy[i]=fz[i]=0;
   for (i = 0; i < NCR; i++) fxc[i]=fyc[i]=fzc[i]=0;
     Epot=(Ebon=bond(0))+(Eben=bend(0))+(Erep=exvol(0))+(Etor=torsion(0))+
-      (Econ=cont(0))+(Ehp=hp(0))+(Ecc = crowd_crowd(0))+(Ecb = crowd_bead(0));
+      (Econ=cont(0))+(Ehp=hp(0))+(Eel=el(0))+(Ecc = crowd_crowd(0))+(Ecb = crowd_bead(0));
 
   for (i=0;i<NCR;i++) {
     frcdx[i] = gasdev2() * tconstcr[ind];
@@ -1249,7 +1251,7 @@ void init(int iflag) {
   printf("  Ekin %f Epot %f\n",Ekin,Epot);
   printf("  Ebon %f Eben %f Erep %f Etor %f Econ %f Econ1 %lf Econ2 %lf Ecorr %lf\n",
 	 Ebon,Eben,Erep,Etor,Econ,Econ1,Econ2,Ecorr);
-  printf("  Ehp %f Ecc %f Ecb %f\n",Ehp, Ecc, Ecb);
+  printf("  Ehp %f Eel %f Ecc %f Ecb %f\n",Ehp, Eel, Ecc, Ecb);
 
   
   /* print energy functions */

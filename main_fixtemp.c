@@ -48,14 +48,14 @@ int main (int argc,char *argv[])
       rmsd2 = rmsd_calc(xnat2,ynat2,znat2,x,y,z,0,N-1);
 
       o[1]=Ekin; o[2]=Epot; o[3]=Ebon; o[4]=Eben; o[5]=Erep; o[6]=Etor;
-      o[7]=Econ1; o[8]=Econ2; o[9]=Ecorr;  o[10]=Ecc; o[11]=Ecb; o[12]=Ehp;
+      o[7]=Econ1; o[8]=Econ2; o[9]=Ecorr;  o[10]=Ecc; o[11]=Ecb; o[12]=Ehp; o[13]=Eel;
 
-      o[13] = rmsd1; 
-      o[14] = rmsd2;
-      o[15] = (nn1 = no_cont()) / max(npair,1);  
-      o[16] = (nn2 = no_cont2()) / max(npair2,1);
-      o[17] = (nn1 > qcut_a ? 1 : 0);
-      o[18] = (nn2 > qcut_b ? 1 : 0);
+      o[14] = rmsd1; 
+      o[15] = rmsd2;
+      o[16] = (nn1 = no_cont()) / max(npair,1);  
+      o[17] = (nn2 = no_cont2()) / max(npair2,1);
+      o[18] = (nn1 > qcut_a ? 1 : 0);
+      o[19] = (nn2 > qcut_b ? 1 : 0);
           
       if ((imd+1) > NTHERM) {
         so[ind][0]++; for (i=0 ; i<NOBS; i++) so[ind][i] += o[i];
